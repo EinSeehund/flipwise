@@ -6,7 +6,7 @@ const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
 export default function FlashcardList() {
   const {
-    data: flashcardsArray,
+    data: flashcards,
     isLoading,
     error,
   } = useSWR("/api/flashcards", fetcher);
@@ -21,7 +21,7 @@ export default function FlashcardList() {
 
   return (
     <StyledList>
-      {flashcardsArray.map((flashcard) => (
+      {flashcards.map((flashcard) => (
         <li key={flashcard._id}>
           <Flashcard flashcardObject={flashcard} />
         </li>
