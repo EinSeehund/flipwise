@@ -1,69 +1,162 @@
 import styled from "styled-components";
+import { useState } from "react";
 
 export default function Flashcard({ flashcardObject }) {
+  const [isFlipped, setIsFlipped] = useState(false);
+
   return (
-    <StyledFlashcard $flashcardObject={flashcardObject}>
-      <StyledCollectionTag>{flashcardObject.collection}</StyledCollectionTag>
-      <StyledFlashcardText>
-        <StyledQATag>Question:</StyledQATag>
-        <p>{flashcardObject.question}</p>
-        <StyledQATag>Answer:</StyledQATag>
-        <p>{flashcardObject.answer}</p>
-      </StyledFlashcardText>
-    </StyledFlashcard>
+    <StyledFlashcardContainer onClick={() => setIsFlipped(!isFlipped)}>
+      <StyledFlashcard $isFlipped={isFlipped}>
+        <StyledFlashcardFront $flashcardObject={flashcardObject}>
+          <StyledCollectionTag>
+            {flashcardObject.collection}
+          </StyledCollectionTag>
+          <StyledFlashcardText>
+            <StyledQATag>❓</StyledQATag>
+            <p>{flashcardObject.question}</p>
+          </StyledFlashcardText>
+        </StyledFlashcardFront>
+        <StyledFlashcardBack $flashcardObject={flashcardObject}>
+          <StyledCollectionTag>
+            {flashcardObject.collection}
+          </StyledCollectionTag>
+          <StyledFlashcardText>
+            <StyledQATag>✔️</StyledQATag>
+            <p>{flashcardObject.answer}</p>
+          </StyledFlashcardText>
+        </StyledFlashcardBack>
+      </StyledFlashcard>
+    </StyledFlashcardContainer>
   );
 }
 
-const StyledFlashcard = styled.article`
-  background-color: ${({ $flashcardObject }) => {
-    switch ($flashcardObject.collection) {
-      case "Biology":
-        return "green";
-        break;
-      case "Geography":
-        return "orange";
-        break;
-      case "Technology":
-        return "lightblue";
-        break;
-      case "Chemistry":
-        return "purple";
-        break;
-      case "Physics":
-        return "yellow";
-        break;
-      case "Art":
-        return "pink";
-        break;
-      case "Music":
-        return "red";
-        break;
-      case "Math":
-        return "brown";
-        break;
-      default:
-        return "gray";
-    }
-    if ($flashcardObject?.collection === "Biology") {
-      return "#000000";
-    }
-    return "#ffffff";
-  }};
-  padding: 10px;
+const StyledFlashcard = styled.div`
+  width: 100%;
+  position: relative;
+  display: grid;
+  border: 1px solid #e4e2e2;
+  padding: 4px;
   border-radius: 10px;
+  box-shadow:
+    0 4px 8px 0 rgba(0, 0, 0, 0.2),
+    0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+  transform: ${({ $isFlipped }) =>
+    $isFlipped ? "rotateY(180deg)" : "rotateY(0deg)"};
 `;
-
 const StyledCollectionTag = styled.p`
+  align-self: flex-start;
+  font-size: 1rem;
+  font-weight: 400;
   margin: 0 0 10px 5px;
+  color: white;
 `;
-
 const StyledFlashcardText = styled.section`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
   padding: 10px;
   margin: 0;
   background-color: white;
   border-radius: 0 0 10px 10px;
 `;
-
-const StyledQATag = styled.p`
-  font-size: 0.7rem;
+const StyledQATag = styled.div`
+  font-size: 1.2rem;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  top: 10px;
+  right: 12px;
+  background-color: white;
+`;
+const StyledFlashcardContainer = styled.article`
+  width: 90vw;
+  max-width: 400px;
+  cursor: pointer;
+  perspective: 1000px;
+`;
+const FlashcardFace = styled.div`
+  backface-visibility: hidden;
+  grid-area: 1 / 1 / 2 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+`;
+const StyledFlashcardFront = styled(FlashcardFace)`
+  font-size: 1.2rem;
+  font-weight: 600;
+  background: ${({ $flashcardObject }) => {
+    switch ($flashcardObject.collection) {
+      case "Biology":
+        return "linear-gradient(135deg, #166534, #15803d)";
+        break;
+      case "Geography":
+        return "linear-gradient(135deg, #c2410c, #ea580c)";
+        break;
+      case "Technology":
+        return "linear-gradient(135deg, #0369a1, #0284c7)";
+        break;
+      case "Chemistry":
+        return "linear-gradient(135deg, #7e22ce, #a21caf)";
+        break;
+      case "Physics":
+        return "linear-gradient(135deg, #a16207, #ca8a04)";
+        break;
+      case "Art":
+        return "linear-gradient(135deg, #be185d, #db2777)";
+        break;
+      case "Music":
+        return "linear-gradient(135deg, #991b1b, #dc2626)";
+        break;
+      case "Math":
+        return "linear-gradient(135deg, #78350f, #92400e)";
+        break;
+      default:
+        return "linear-gradient(135deg, #374151, #4b5563)";
+    }
+  }};
+`;
+const StyledFlashcardBack = styled(FlashcardFace)`
+  transform: rotateY(180deg);
+  font-size: 1.2rem;
+  font-weight: 400;
+  background: ${({ $flashcardObject }) => {
+    switch ($flashcardObject.collection) {
+      case "Biology":
+        return "linear-gradient(135deg, #16a34a, #22c55e)";
+        break;
+      case "Geography":
+        return "linear-gradient(135deg, #ea580c, #f97316)";
+        break;
+      case "Technology":
+        return "linear-gradient(135deg, #0284c7, #0ea5e9)";
+        break;
+      case "Chemistry":
+        return "linear-gradient(135deg, #a855f7, #c026d3)";
+        break;
+      case "Physics":
+        return "linear-gradient(135deg, #ca8a04, #eab308)";
+        break;
+      case "Art":
+        return "linear-gradient(135deg, #db2777, #ec4899)";
+        break;
+      case "Music":
+        return "linear-gradient(135deg, #dc2626, #ef4444)";
+        break;
+      case "Math":
+        return "linear-gradient(135deg, #a16207, #b7791f)";
+        break;
+      default:
+        return "linear-gradient(135deg, #4b5563, #6b7280)";
+    }
+  }};
 `;
