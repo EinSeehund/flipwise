@@ -1,9 +1,15 @@
+import FlashcardForm from "@/components/FlashcardForm/FlashcardForm";
 import FlashcardList from "@/components/FlashcardList/FlashcardList";
 
-export default function HomePage() {
+export default function HomePage({ flashcards, isLoading, error }) {
   return (
     <main>
-      <FlashcardList />
+      <FlashcardForm />
+      <FlashcardList
+        flashcards={flashcards}
+        isLoading={isLoading}
+        error={error}
+      />
     </main>
   );
 }

@@ -4,13 +4,7 @@ import styled from "styled-components";
 
 const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
-export default function FlashcardList() {
-  const {
-    data: flashcards,
-    isLoading,
-    error,
-  } = useSWR("/api/flashcards", fetcher);
-
+export default function FlashcardList({ flashcards, isLoading, error }) {
   if (isLoading) {
     return <p>Loading...</p>;
   }
