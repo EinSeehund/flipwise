@@ -1,10 +1,8 @@
 import styled from "styled-components";
-import useSWR from "swr";
-
-const fetcher = (...args) => fetch(...args).then((response) => response.json());
+import useSWR, { useSWRConfig } from "swr";
 
 export default function FlashcardForm() {
-  const { mutate } = useSWR("/api/flashcards", fetcher);
+  const { mutate } = useSWRConfig();
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -21,7 +19,7 @@ export default function FlashcardForm() {
     });
 
     if (response.ok) {
-      mutate();
+      mutate("/api/flashcards");
     }
 
     event.target.reset();

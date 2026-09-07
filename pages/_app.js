@@ -1,6 +1,6 @@
 import Header from "@/components/Header/Header";
 import GlobalStyle from "../styles";
-import useSWR from "swr";
+import useSWR, { SWRConfig } from "swr";
 
 const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
@@ -15,12 +15,14 @@ export default function App({ Component, pageProps }) {
     <>
       <GlobalStyle />
       <Header />
-      <Component
-        {...pageProps}
-        flashcards={flashcards}
-        isLoading={isLoading}
-        error={error}
-      />
+      <SWRConfig value={{ fetcher }}>
+        <Component
+          {...pageProps}
+          flashcards={flashcards}
+          isLoading={isLoading}
+          error={error}
+        />
+      </SWRConfig>
     </>
   );
 }
