@@ -6,7 +6,7 @@ export default function Flashcard({ flashcardObject }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [editActive, setEditActive] = useState(false);
 
-  function toggleEdit() {
+  function onToggleEdit() {
     setEditActive(!editActive);
   }
 
@@ -36,14 +36,14 @@ export default function Flashcard({ flashcardObject }) {
       </StyledFlashcardContainer>
       <StyledButtonContainer>
         {!editActive && (
-          <StyledEditButton onClick={toggleEdit}>✎</StyledEditButton>
+          <StyledEditButton aria-label="Edit flashcard" onClick={onToggleEdit}>✎</StyledEditButton>
         )}
       </StyledButtonContainer>
       {editActive && (
         <FlashcardForm
           isEditing={true}
           flashcardObject={flashcardObject}
-          toggleEdit={toggleEdit}
+          onToggleEdit={onToggleEdit}
         />
       )}
     </>

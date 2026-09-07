@@ -12,7 +12,13 @@ export default async function handler(request, response) {
 
   if (request.method === "PUT") {
     try {
-      await Flashcard.findByIdAndUpdate(id, request.body);
+      const updatedFlashcard = await Flashcard.findByIdAndUpdate(
+        id,
+        request.body
+      );
+      if (!updatedFlashcard) {
+        return response.status(404).json({ error: "Flashcard not found" });
+      }
       return response.status(200).json({ status: `Flashcard ${id} updated!` });
     } catch (error) {
       return response.status(500).json({ error: "Error updating flashcard" });

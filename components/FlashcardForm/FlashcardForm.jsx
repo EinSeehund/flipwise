@@ -5,42 +5,46 @@ import useSWR, { useSWRConfig } from "swr";
 export default function FlashcardForm({
   isEditing,
   flashcardObject,
-  toggleEdit,
+  onToggleEdit,
 }) {
   const { mutate } = useSWRConfig();
+  const [error, setError] = useState(null);
 
   async function handleSubmit(event) {
     event.preventDefault();
+    setError(null);
 
     const formData = new FormData(event.target);
     const formObject = Object.fromEntries(formData.entries());
     let response;
 
-    if (isEditing) {
-      response = await fetch(`/api/flashcards/${flashcardObject._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formObject),
-      });
-    } else {
-      response = await fetch("/api/flashcards", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formObject),
-      });
-    }
+    try {
+      if (isEditing) {
+        response = await fetch(`/api/flashcards/${flashcardObject._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formObject),
+        });
+      } else {
+        response = await fetch("/api/flashcards", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formObject),
+        });
+      }
 
-    if (response.ok) {
-      mutate("/api/flashcards");
-      if (isEditing) toggleEdit();
-      else event.target.reset();
+      if (response.ok) {
+        mutate("/api/flashcards");
+        if (isEditing) onToggleEdit();
+        else event.target.reset();
+      }
+    } catch (error) {
+      setError(error.message);
     }
-
-    event.target.reset();
   }
 
   return (
@@ -79,9 +83,12 @@ export default function FlashcardForm({
         <option value="Physics">Physics</option>
         <option value="Technology">Technology</option>
       </StyledSelect>
+      {error && <StyledError role="alert">Error: {error}</StyledError>}
       <StyledSubmitButton>{isEditing ? "Update" : "Create"}</StyledSubmitButton>
       {isEditing && (
-        <StyledCancelButton onClick={toggleEdit}>Cancel</StyledCancelButton>
+        <StyledCancelButton type="button" onClick={onToggleEdit}>
+          Cancel
+        </StyledCancelButton>
       )}
     </StyledForm>
   );
@@ -142,4 +149,8 @@ const StyledCancelButton = styled.button`
   &:hover {
     cursor: pointer;
   }
+`;
+const StyledError = styled.p`
+  color: #b42318;
+  margin: 0 0 16px;
 `;
