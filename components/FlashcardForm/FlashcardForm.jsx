@@ -77,6 +77,7 @@ const StyledTextarea = styled.textarea`
   padding: 8px;
   margin-bottom: 16px;
   border-radius: 8px;
+  resize: none;
 `;
 
 const StyledLabel = styled.label`
@@ -100,4 +101,7 @@ const StyledButton = styled.button`
   background-color: #5f5fd2;
   color: white;
   border: none;
+  &:hover {
+    cursor: pointer;
+  }
 `;
