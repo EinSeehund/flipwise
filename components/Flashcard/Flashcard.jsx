@@ -1,32 +1,52 @@
 import styled from "styled-components";
 import { useState } from "react";
+import FlashcardForm from "../FlashcardForm/FlashcardForm";
 
 export default function Flashcard({ flashcardObject }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [editActive, setEditActive] = useState(false);
+
+  function toggleEdit() {
+    setEditActive(!editActive);
+  }
 
   return (
-    <StyledFlashcardContainer onClick={() => setIsFlipped(!isFlipped)}>
-      <StyledFlashcard $isFlipped={isFlipped}>
-        <StyledFlashcardFront $flashcardObject={flashcardObject}>
-          <StyledCollectionTag>
-            {flashcardObject.collection}
-          </StyledCollectionTag>
-          <StyledFlashcardText>
-            <StyledQATag>❓</StyledQATag>
-            <p>{flashcardObject.question}</p>
-          </StyledFlashcardText>
-        </StyledFlashcardFront>
-        <StyledFlashcardBack $flashcardObject={flashcardObject}>
-          <StyledCollectionTag>
-            {flashcardObject.collection}
-          </StyledCollectionTag>
-          <StyledFlashcardText>
-            <StyledQATag>✔️</StyledQATag>
-            <p>{flashcardObject.answer}</p>
-          </StyledFlashcardText>
-        </StyledFlashcardBack>
-      </StyledFlashcard>
-    </StyledFlashcardContainer>
+    <>
+      <StyledFlashcardContainer onClick={() => setIsFlipped(!isFlipped)}>
+        <StyledFlashcard $isFlipped={isFlipped}>
+          <StyledFlashcardFront $flashcardObject={flashcardObject}>
+            <StyledCollectionTag>
+              {flashcardObject.collection}
+            </StyledCollectionTag>
+            <StyledFlashcardText>
+              <StyledQATag>❓</StyledQATag>
+              <p>{flashcardObject.question}</p>
+            </StyledFlashcardText>
+          </StyledFlashcardFront>
+          <StyledFlashcardBack $flashcardObject={flashcardObject}>
+            <StyledCollectionTag>
+              {flashcardObject.collection}
+            </StyledCollectionTag>
+            <StyledFlashcardText>
+              <StyledQATag>✔️</StyledQATag>
+              <p>{flashcardObject.answer}</p>
+            </StyledFlashcardText>
+          </StyledFlashcardBack>
+        </StyledFlashcard>
+      </StyledFlashcardContainer>
+      <StyledButtonContainer>
+        {!editActive && (
+          <StyledEditButton onClick={toggleEdit}>✎</StyledEditButton>
+        )}
+      </StyledButtonContainer>
+      {editActive && (
+        <FlashcardForm
+          isEditing={true}
+          flashcardObject={flashcardObject}
+          toggleEdit={toggleEdit}
+        />
+      )}
+    </>
   );
 }
 
@@ -159,4 +179,19 @@ const StyledFlashcardBack = styled(FlashcardFace)`
         return "linear-gradient(135deg, #4b5563, #6b7280)";
     }
   }};
+`;
+const StyledButtonContainer = styled.div`
+width: 97%;
+  display: flex;
+  justify-content: flex-end;
+`;
+const StyledEditButton = styled.button`
+  font-size: 1.2rem;
+  border: none;
+  background-color: #605b5b;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-top: 8px;
 `;
