@@ -1,37 +1,60 @@
+import { useState } from "react";
 import styled from "styled-components";
 import useSWR, { useSWRConfig } from "swr";
 
-export default function FlashcardForm() {
+export default function FlashcardForm({
+  isEditing,
+  flashcardObject,
+  onToggleEdit,
+}) {
   const { mutate } = useSWRConfig();
+  const [error, setError] = useState(null);
 
   async function handleSubmit(event) {
     event.preventDefault();
+    setError(null);
 
     const formData = new FormData(event.target);
     const formObject = Object.fromEntries(formData.entries());
+    let response;
 
-    const response = await fetch("/api/flashcards", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formObject),
-    });
+    try {
+      if (isEditing) {
+        response = await fetch(`/api/flashcards/${flashcardObject._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formObject),
+        });
+      } else {
+        response = await fetch("/api/flashcards", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formObject),
+        });
+      }
 
-    if (response.ok) {
-      mutate("/api/flashcards");
+      if (response.ok) {
+        mutate("/api/flashcards");
+        if (isEditing) onToggleEdit();
+        else event.target.reset();
+      }
+    } catch (error) {
+      setError(error.message);
     }
-
-    event.target.reset();
   }
 
   return (
     <StyledForm onSubmit={handleSubmit}>
-      <h2>Create a new flashcard</h2>
+      <h2>{isEditing ? "Edit flashcard" : "Create a new flashcard"}</h2>
       <StyledLabel htmlFor="question">Question</StyledLabel>
       <StyledTextarea
         name="question"
         id="question"
+        defaultValue={isEditing ? flashcardObject.question : ""}
         placeholder="Enter your question..."
         required
       ></StyledTextarea>
@@ -39,11 +62,17 @@ export default function FlashcardForm() {
       <StyledTextarea
         name="answer"
         id="answer"
+        defaultValue={isEditing ? flashcardObject.answer : ""}
         placeholder="Enter the answer..."
         required
       ></StyledTextarea>
       <StyledLabel htmlFor="collection">Collection</StyledLabel>
-      <StyledSelect name="collection" id="collection" required>
+      <StyledSelect
+        name="collection"
+        id="collection"
+        defaultValue={isEditing ? flashcardObject.collection : ""}
+        required
+      >
         <option value="">-- Please select an option --</option>
         <option value="Art">Art</option>
         <option value="Biology">Biology</option>
@@ -54,7 +83,13 @@ export default function FlashcardForm() {
         <option value="Physics">Physics</option>
         <option value="Technology">Technology</option>
       </StyledSelect>
-      <StyledButton>Create</StyledButton>
+      {error && <StyledError role="alert">Error: {error}</StyledError>}
+      <StyledSubmitButton>{isEditing ? "Update" : "Create"}</StyledSubmitButton>
+      {isEditing && (
+        <StyledCancelButton type="button" onClick={onToggleEdit}>
+          Cancel
+        </StyledCancelButton>
+      )}
     </StyledForm>
   );
 }
@@ -91,7 +126,7 @@ const StyledSelect = styled.select`
   border-radius: 8px;
 `;
 
-const StyledButton = styled.button`
+const StyledSubmitButton = styled.button`
   font-family: inherit;
   font-size: inherit;
   padding: 16px 32px;
@@ -102,4 +137,20 @@ const StyledButton = styled.button`
   &:hover {
     cursor: pointer;
   }
+`;
+const StyledCancelButton = styled.button`
+  font-family: inherit;
+  font-size: inherit;
+  padding: 16px 32px;
+  border-radius: 8px;
+  background: none;
+  color: #5f5fd2;
+  border: none;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+const StyledError = styled.p`
+  color: #b42318;
+  margin: 0 0 16px;
 `;
