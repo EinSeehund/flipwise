@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styled from "styled-components";
-import { useSWRConfig } from "swr";
+import { mutate } from "swr";
 
 export default function DeleteConfirmationDialog({
   onToggleDeleteConfirmation,
@@ -8,8 +8,6 @@ export default function DeleteConfirmationDialog({
   onToggleToast,
 }) {
   const [error, setError] = useState(null);
-
-  const { mutate } = useSWRConfig();
 
   async function handleDelete(id) {
     try {

@@ -1,8 +1,5 @@
-import useSWR from "swr";
 import Flashcard from "../Flashcard/Flashcard";
 import styled from "styled-components";
-
-const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
 export default function FlashcardList({
   flashcards,
