@@ -25,5 +25,17 @@ export default async function handler(request, response) {
     }
   }
 
+  if (request.method === "DELETE") {
+    try {
+      const deletedFlashcard = await Flashcard.findByIdAndDelete(id);
+      if (!deletedFlashcard) {
+        return response.status(404).json({ error: "Flashcard not found" });
+      }
+      return response.status(200).json({ status: `Flashcard ${id} updated!` });
+    } catch (error) {
+      return response.status(500).json({ error: "Error deleting flashcard" });
+    }
+  }
+
   return response.status(405).json({ message: "Method not allowed" });
 }

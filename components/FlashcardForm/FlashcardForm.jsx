@@ -102,7 +102,6 @@ const StyledForm = styled.form`
   max-width: 400px;
   margin-bottom: 32px;
 `;
-
 const StyledTextarea = styled.textarea`
   width: 80%;
   font-family: inherit;
@@ -112,11 +111,9 @@ const StyledTextarea = styled.textarea`
   border-radius: 8px;
   resize: none;
 `;
-
 const StyledLabel = styled.label`
   margin-bottom: 4px;
 `;
-
 const StyledSelect = styled.select`
   width: 80%;
   font-family: inherit;
@@ -125,7 +122,6 @@ const StyledSelect = styled.select`
   margin-bottom: 32px;
   border-radius: 8px;
 `;
-
 const StyledSubmitButton = styled.button`
   font-family: inherit;
   font-size: inherit;

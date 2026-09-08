@@ -4,7 +4,12 @@ import styled from "styled-components";
 
 const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
-export default function FlashcardList({ flashcards, isLoading, error }) {
+export default function FlashcardList({
+  flashcards,
+  isLoading,
+  error,
+  onToggleToast,
+}) {
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -15,11 +20,18 @@ export default function FlashcardList({ flashcards, isLoading, error }) {
 
   return (
     <StyledList>
-      {flashcards.map((flashcard) => (
-        <li key={flashcard._id}>
-          <Flashcard flashcardObject={flashcard} />
-        </li>
-      ))}
+      {flashcards.length === 0 ? (
+        <p>There are no flashcards, yet. Start by adding some new ones!</p>
+      ) : (
+        flashcards.map((flashcard) => (
+          <li key={flashcard._id}>
+            <Flashcard
+              flashcardObject={flashcard}
+              onToggleToast={onToggleToast}
+            />
+          </li>
+        ))
+      )}
     </StyledList>
   );
 }
