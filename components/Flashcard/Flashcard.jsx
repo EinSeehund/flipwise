@@ -1,13 +1,19 @@
 import styled from "styled-components";
 import { useState } from "react";
 import FlashcardForm from "../FlashcardForm/FlashcardForm";
+import DeleteConfirmationDialog from "../DeleteConfirmationDialog/DeleteConfirmationDialog";
 
-export default function Flashcard({ flashcardObject }) {
+export default function Flashcard({ flashcardObject, onToggleToast }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [editActive, setEditActive] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   function onToggleEdit() {
     setEditActive(!editActive);
+  }
+
+  function onToggleDeleteConfirmation() {
+    setShowDeleteConfirmation(!showDeleteConfirmation);
   }
 
   return (
@@ -36,14 +42,29 @@ export default function Flashcard({ flashcardObject }) {
       </StyledFlashcardContainer>
       <StyledButtonContainer>
         {!editActive && (
-          <StyledEditButton aria-label="Edit flashcard" onClick={onToggleEdit}>✎</StyledEditButton>
+          <StyledEditButton aria-label="Edit flashcard" onClick={onToggleEdit}>
+            ✎
+          </StyledEditButton>
         )}
+        <StyledDeleteButton
+          aria-label="Delete flashcard"
+          onClick={onToggleDeleteConfirmation}
+        >
+          ✖
+        </StyledDeleteButton>
       </StyledButtonContainer>
       {editActive && (
         <FlashcardForm
           isEditing={true}
           flashcardObject={flashcardObject}
           onToggleEdit={onToggleEdit}
+        />
+      )}
+      {showDeleteConfirmation && (
+        <DeleteConfirmationDialog
+          onToggleDeleteConfirmation={onToggleDeleteConfirmation}
+          flashcardId={flashcardObject._id}
+          onToggleToast={onToggleToast}
         />
       )}
     </>
@@ -181,7 +202,7 @@ const StyledFlashcardBack = styled(FlashcardFace)`
   }};
 `;
 const StyledButtonContainer = styled.div`
-width: 97%;
+  width: 97%;
   display: flex;
   justify-content: flex-end;
 `;
@@ -194,4 +215,23 @@ const StyledEditButton = styled.button`
   width: 30px;
   height: 30px;
   margin-top: 8px;
+  margin-right: 8px;
+  &:hover {
+    cursor: pointer;
+    background-color: #7e7777;
+  }
+`;
+const StyledDeleteButton = styled.button`
+  font-size: 1.2rem;
+  border: none;
+  background-color: #dc1a1a;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-top: 8px;
+  &:hover {
+    cursor: pointer;
+    background-color: #f34343;
+  }
 `;
