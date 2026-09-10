@@ -39,15 +39,13 @@ const StyledList = styled.ul`
 `;
 
 const StyledNavigation = styled.nav`
-  @media screen and (max-width: 1024px) {
-    position: fixed;
-    background-color: #9a9af8;
-    bottom: 0;
-    left: 0;
-    z-index: 9;
-    width: 100vw;
-    margin: 0;
-  }
+  position: fixed;
+  background-color: #9a9af8;
+  bottom: 0;
+  left: 0;
+  z-index: 9;
+  width: 100vw;
+  margin: 0;
 `;
 
 const StyledLink = styled(Link)`
