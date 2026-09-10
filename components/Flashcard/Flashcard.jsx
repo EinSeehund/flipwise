@@ -3,10 +3,24 @@ import { useState } from "react";
 import FlashcardForm from "../FlashcardForm/FlashcardForm";
 import DeleteConfirmationDialog from "../DeleteConfirmationDialog/DeleteConfirmationDialog";
 
-export default function Flashcard({ flashcardObject, onToggleToast }) {
+export default function Flashcard({
+  flashcardObject,
+  onToggleToast,
+  quizModeActive,
+  onFlip,
+}) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [editActive, setEditActive] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  function handleFlip() {
+    if (quizModeActive) {
+      onFlip();
+      setIsFlipped(true);
+    } else {
+      setIsFlipped(!isFlipped);
+    }
+  }
 
   function onToggleEdit() {
     setEditActive(!editActive);
@@ -18,7 +32,7 @@ export default function Flashcard({ flashcardObject, onToggleToast }) {
 
   return (
     <>
-      <StyledFlashcardContainer onClick={() => setIsFlipped(!isFlipped)}>
+      <StyledFlashcardContainer onClick={handleFlip}>
         <StyledFlashcard $isFlipped={isFlipped}>
           <StyledFlashcardFront $flashcardObject={flashcardObject}>
             <StyledCollectionTag>
@@ -41,17 +55,19 @@ export default function Flashcard({ flashcardObject, onToggleToast }) {
         </StyledFlashcard>
       </StyledFlashcardContainer>
       <StyledButtonContainer>
-        {!editActive && (
+        {!editActive && !quizModeActive && (
           <StyledEditButton aria-label="Edit flashcard" onClick={onToggleEdit}>
             ✎
           </StyledEditButton>
         )}
-        <StyledDeleteButton
-          aria-label="Delete flashcard"
-          onClick={onToggleDeleteConfirmation}
-        >
-          ✖
-        </StyledDeleteButton>
+        {!quizModeActive && (
+          <StyledDeleteButton
+            aria-label="Delete flashcard"
+            onClick={onToggleDeleteConfirmation}
+          >
+            ✖
+          </StyledDeleteButton>
+        )}
       </StyledButtonContainer>
       {editActive && (
         <FlashcardForm
@@ -102,6 +118,7 @@ const StyledFlashcardText = styled.section`
   margin: 0;
   background-color: white;
   border-radius: 0 0 10px 10px;
+  font-family: "Times New Roman", Times, serif;
 `;
 const StyledQATag = styled.div`
   font-size: 1.2rem;
