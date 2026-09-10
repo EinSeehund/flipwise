@@ -176,7 +176,7 @@ export default function QuizPage({ flashcards }) {
       )}
       {currentScreen === "result" && (
         <ResultContainer>
-          <ResultHeadline>Finished!</ResultHeadline>
+          <ResultHeadline>Finished!!!</ResultHeadline>
           <ResultPartyPopper>🎉</ResultPartyPopper>
           <ResultStatistic>
             You&apos;ve answered {quizState.correctCards} of {quizCards.length}{" "}
