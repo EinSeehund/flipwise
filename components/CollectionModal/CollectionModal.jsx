@@ -10,7 +10,8 @@ export default function CollectionModal({ onClose, handleFilter }) {
   const [colorLightInput, setColorLightInput] = useState("#3e3e3e");
   const [error, setError] = useState(null);
 
-  async function submitCollection() {
+  async function handleSubmit(event) {
+    event.preventDefault();
     setError(null);
 
     const collectionObject = {
@@ -63,7 +64,7 @@ export default function CollectionModal({ onClose, handleFilter }) {
 
   return (
     <ModalContainer>
-      <ModalInputContainer>
+      <ModalForm onSubmit={handleSubmit}>
         <p>Collection Title:</p>
         <input
           value={titleInput}
@@ -84,13 +85,15 @@ export default function CollectionModal({ onClose, handleFilter }) {
           />
         </ColorContainer>
         <div>
-          <AddButton disabled={titleInput === ""} onClick={submitCollection}>
+          <AddButton disabled={titleInput === ""} type="submit">
             Add
           </AddButton>
-          <CancelButton onClick={onClose}>Cancel</CancelButton>
+          <CancelButton onClick={onClose} type="button">
+            Cancel
+          </CancelButton>
         </div>
         {error && <p>{error}</p>}
-      </ModalInputContainer>
+      </ModalForm>
     </ModalContainer>
   );
 }
@@ -107,7 +110,7 @@ const ModalContainer = styled.div`
   align-items: center;
 `;
 
-const ModalInputContainer = styled.div`
+const ModalForm = styled.form`
   background-color: white;
   width: 90%;
   max-width: 400px;
