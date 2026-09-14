@@ -5,6 +5,7 @@ import DeleteConfirmationDialog from "../DeleteConfirmationDialog/DeleteConfirma
 
 export default function Flashcard({
   flashcardObject,
+  collections,
   onToggleToast,
   quizModeActive,
   onFlip,
@@ -12,6 +13,10 @@ export default function Flashcard({
   const [isFlipped, setIsFlipped] = useState(false);
   const [editActive, setEditActive] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const currentCollection = collections.find(
+    (collection) => collection._id === flashcardObject.collection_id
+  );
 
   function handleFlip() {
     if (quizModeActive) {
@@ -34,18 +39,24 @@ export default function Flashcard({
     <>
       <StyledFlashcardContainer onClick={handleFlip}>
         <StyledFlashcard $isFlipped={isFlipped}>
-          <StyledFlashcardFront $flashcardObject={flashcardObject}>
+          <StyledFlashcardFront
+            $flashcardObject={flashcardObject}
+            $backgroundColor={currentCollection.colorDark}
+          >
             <StyledCollectionTag>
-              {flashcardObject.collection}
+              {currentCollection.collectionTitle}
             </StyledCollectionTag>
             <StyledFlashcardText>
               <StyledQATag>❓</StyledQATag>
               <p>{flashcardObject.question}</p>
             </StyledFlashcardText>
           </StyledFlashcardFront>
-          <StyledFlashcardBack $flashcardObject={flashcardObject}>
+          <StyledFlashcardBack
+            $flashcardObject={flashcardObject}
+            $backgroundColor={currentCollection.colorLight}
+          >
             <StyledCollectionTag>
-              {flashcardObject.collection}
+              {currentCollection.collectionTitle}
             </StyledCollectionTag>
             <StyledFlashcardText>
               <StyledQATag>✔️</StyledQATag>
@@ -74,6 +85,7 @@ export default function Flashcard({
           isEditing={true}
           flashcardObject={flashcardObject}
           onToggleEdit={onToggleEdit}
+          collections={collections}
         />
       )}
       {showDeleteConfirmation && (
@@ -152,71 +164,13 @@ const FlashcardFace = styled.div`
 const StyledFlashcardFront = styled(FlashcardFace)`
   font-size: 1.2rem;
   font-weight: 600;
-  background: ${({ $flashcardObject }) => {
-    switch ($flashcardObject.collection) {
-      case "Biology":
-        return "linear-gradient(135deg, #166534, #15803d)";
-        break;
-      case "Geography":
-        return "linear-gradient(135deg, #c2410c, #ea580c)";
-        break;
-      case "Technology":
-        return "linear-gradient(135deg, #0369a1, #0284c7)";
-        break;
-      case "Chemistry":
-        return "linear-gradient(135deg, #7e22ce, #a21caf)";
-        break;
-      case "Physics":
-        return "linear-gradient(135deg, #a16207, #ca8a04)";
-        break;
-      case "Art":
-        return "linear-gradient(135deg, #be185d, #db2777)";
-        break;
-      case "Music":
-        return "linear-gradient(135deg, #991b1b, #dc2626)";
-        break;
-      case "Math":
-        return "linear-gradient(135deg, #78350f, #92400e)";
-        break;
-      default:
-        return "linear-gradient(135deg, #374151, #4b5563)";
-    }
-  }};
+  background-color: ${({ $backgroundColor }) => $backgroundColor};
 `;
 const StyledFlashcardBack = styled(FlashcardFace)`
   transform: rotateY(180deg);
   font-size: 1.2rem;
   font-weight: 400;
-  background: ${({ $flashcardObject }) => {
-    switch ($flashcardObject.collection) {
-      case "Biology":
-        return "linear-gradient(135deg, #16a34a, #22c55e)";
-        break;
-      case "Geography":
-        return "linear-gradient(135deg, #ea580c, #f97316)";
-        break;
-      case "Technology":
-        return "linear-gradient(135deg, #0284c7, #0ea5e9)";
-        break;
-      case "Chemistry":
-        return "linear-gradient(135deg, #a855f7, #c026d3)";
-        break;
-      case "Physics":
-        return "linear-gradient(135deg, #ca8a04, #eab308)";
-        break;
-      case "Art":
-        return "linear-gradient(135deg, #db2777, #ec4899)";
-        break;
-      case "Music":
-        return "linear-gradient(135deg, #dc2626, #ef4444)";
-        break;
-      case "Math":
-        return "linear-gradient(135deg, #a16207, #b7791f)";
-        break;
-      default:
-        return "linear-gradient(135deg, #4b5563, #6b7280)";
-    }
-  }};
+  background-color: ${({ $backgroundColor }) => $backgroundColor};
 `;
 const StyledButtonContainer = styled.div`
   width: 97%;

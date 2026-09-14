@@ -4,50 +4,12 @@ import { useState } from "react";
 import styled from "styled-components";
 import fisherYatesShuffle from "@/utils/fisherYatesShuffle";
 
-const collections = [
-  {
-    collectionTitle: "Biology",
-    colorDark: "#166534",
-    colorLight: "#15803d",
-  },
-  {
-    collectionTitle: "Geography",
-    colorDark: "#c2410c",
-    colorLight: "#ea580c",
-  },
-  {
-    collectionTitle: "Technology",
-    colorDark: "#0369a1",
-    colorLight: "#0284c7",
-  },
-  {
-    collectionTitle: "Chemistry",
-    colorDark: "#7e22ce",
-    colorLight: "#a21caf",
-  },
-  {
-    collectionTitle: "Physics",
-    colorDark: "#a16207",
-    colorLight: "#ca8a04",
-  },
-  {
-    collectionTitle: "Art",
-    colorDark: "#be185d",
-    colorLight: "#db2777",
-  },
-  {
-    collectionTitle: "Music",
-    colorDark: "#991b1b",
-    colorLight: "#dc2626",
-  },
-  {
-    collectionTitle: "Math",
-    colorDark: "#78350f",
-    colorLight: "#92400e",
-  },
-];
-
-export default function QuizPage({ flashcards }) {
+export default function QuizPage({
+  flashcards,
+  collections,
+  collectionsIsLoading,
+  collectionsFetchError,
+}) {
   const [currentScreen, setCurrentScreen] = useState("setup");
   const [selectedTags, setSelectedTags] = useState([]);
   const [quizState, setQuizState] = useState({
@@ -57,18 +19,24 @@ export default function QuizPage({ flashcards }) {
   });
   const [quizCards, setQuizCards] = useState([]);
 
-  function handleToggleTag(collectionTitle) {
-    if (selectedTags.includes(collectionTitle)) {
-      setSelectedTags(selectedTags.filter((tag) => tag !== collectionTitle));
+  if (collectionsIsLoading) {
+    return <p>Loading collections...</p>;
+  }
+
+  if (collectionsFetchError) {
+    return <p>Error: {collectionsFetchError.message}</p>;
+  }
+
+  function handleToggleTag(collectionId) {
+    if (selectedTags.includes(collectionId)) {
+      setSelectedTags(selectedTags.filter((tag) => tag !== collectionId));
     } else {
-      setSelectedTags([...selectedTags, collectionTitle]);
+      setSelectedTags([...selectedTags, collectionId]);
     }
   }
 
   function handleSelectAll() {
-    setSelectedTags(
-      collections.map((collection) => collection.collectionTitle)
-    );
+    setSelectedTags(collections.map((collection) => collection._id));
   }
 
   function handleSelectNone() {
@@ -76,11 +44,16 @@ export default function QuizPage({ flashcards }) {
   }
 
   function handleStartQuiz() {
-    setQuizCards(
-      fisherYatesShuffle(
-        flashcards.filter((card) => selectedTags.includes(card.collection))
-      )
+    const cardsForQuiz = fisherYatesShuffle(
+      flashcards.filter((card) => selectedTags.includes(card.collection_id))
     );
+
+    if (cardsForQuiz.length === 0) {
+      alert("There are no cards in the selected collections");
+      return;
+    }
+
+    setQuizCards(cardsForQuiz);
     setCurrentScreen("quizmode");
   }
 
@@ -126,11 +99,12 @@ export default function QuizPage({ flashcards }) {
           <TagContainer>
             {collections.map((collection) => (
               <CollectionTag
-                key={collection.collectionTitle}
+                key={collection._id}
+                collectionId={collection._id}
                 collectionTitle={collection.collectionTitle}
                 colorDark={collection.colorDark}
                 colorLight={collection.colorLight}
-                active={selectedTags.includes(collection.collectionTitle)}
+                active={selectedTags.includes(collection._id)}
                 onToggleTag={handleToggleTag}
               />
             ))}
@@ -155,6 +129,7 @@ export default function QuizPage({ flashcards }) {
           <Flashcard
             key={quizState.currentCardIndex}
             flashcardObject={quizCards[quizState.currentCardIndex]}
+            collections={collections}
             quizModeActive={true}
             onFlip={handleFlipCard}
           />
