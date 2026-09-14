@@ -21,8 +21,10 @@ export default async function handler(request, response) {
 
   if (request.method === "POST") {
     try {
-      await FlashcardCollection.create(request.body);
-      return response.status(201).json({ status: "Collection created" });
+      const collection = await FlashcardCollection.create(request.body);
+      return response
+        .status(201)
+        .json({ status: "Collection created", collection });
     } catch (error) {
       return response.status(400).json({ error: error.message });
     }

@@ -6,6 +6,7 @@ export default function CollectionFilter({
   collectionsFetchError,
   onFilter,
   onToggleModal,
+  filterById
 }) {
   if (collectionsIsLoading) {
     return <p>Loading...</p>;
@@ -22,7 +23,7 @@ export default function CollectionFilter({
   return (
     <CollectionContainer>
       <label htmlFor="filterSelect">Filter Flashcards</label>
-      <StyledSelect id="filterSelect" onChange={handleChange}>
+      <StyledSelect value={filterById} id="filterSelect" onChange={handleChange}>
         <option value={""}>Show all collections</option>
         {collections.map((collection) => (
           <option key={collection._id} value={collection._id}>

@@ -33,7 +33,7 @@ export default function HomePage({
     <main>
       {showToast && <ToastMessage text="Flashcard successfully deleted!" />}
       {showCollectionModal && (
-        <CollectionModal onCancel={toggleCollectionModal} />
+        <CollectionModal onClose={toggleCollectionModal} handleFilter={handleFilter} />
       )}
       <FlashcardForm
         isEditing={false}
@@ -45,6 +45,7 @@ export default function HomePage({
         collections={collections}
         collectionsIsLoading={collectionsIsLoading}
         collectionsFetchError={collectionsFetchError}
+        filterById={filterById}
         onFilter={handleFilter}
         onToggleModal={toggleCollectionModal}
       />

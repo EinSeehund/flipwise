@@ -3,7 +3,7 @@ import { useSWRConfig } from "swr";
 import styled from "styled-components";
 import { lighten, darken } from "polished";
 
-export default function CollectionModal({ onCancel }) {
+export default function CollectionModal({ onClose, handleFilter }) {
   const { mutate } = useSWRConfig();
   const [titleInput, setTitleInput] = useState("");
   const [colorDarkInput, setColorDarkInput] = useState("#000000");
@@ -36,8 +36,11 @@ export default function CollectionModal({ onCancel }) {
       }
 
       if (response.ok) {
+        const responseBody = await response.json();
+        const newCollectionId = responseBody.collection._id;
         mutate("/api/collections");
-        onCancel();
+        handleFilter(newCollectionId);
+        onClose();
       }
     } catch (error) {
       setError(error.message);
@@ -77,14 +80,14 @@ export default function CollectionModal({ onCancel }) {
           <ColorInput
             type="color"
             value={colorLightInput}
-            onChange={handleColorDarkInput}
+            onChange={handleColorLightInput}
           />
         </ColorContainer>
         <div>
           <AddButton disabled={titleInput === ""} onClick={submitCollection}>
             Add
           </AddButton>
-          <CancelButton onClick={onCancel}>Cancel</CancelButton>
+          <CancelButton onClick={onClose}>Cancel</CancelButton>
         </div>
         {error && <p>{error}</p>}
       </ModalInputContainer>
