@@ -5,14 +5,17 @@ export default function FlashcardList({
   flashcards,
   isLoading,
   error,
+  collections,
+  collectionsIsLoading,
+  collectionsFetchError,
   onToggleToast,
 }) {
-  if (isLoading) {
+  if (isLoading || collectionsIsLoading) {
     return <p>Loading...</p>;
   }
 
-  if (error) {
-    return <p>Error: {error.message}</p>;
+  if (error || collectionsFetchError) {
+    return <p>Failed to fetch ressources...</p>;
   }
 
   return (
@@ -24,6 +27,7 @@ export default function FlashcardList({
           <li key={flashcard._id}>
             <Flashcard
               flashcardObject={flashcard}
+              collections={collections}
               onToggleToast={onToggleToast}
             />
           </li>
@@ -39,4 +43,5 @@ const StyledList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-bottom: 100px;
 `;

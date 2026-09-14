@@ -1,19 +1,21 @@
 import styled from "styled-components";
 
 export default function CollectionTag({
+  collectionId,
   collectionTitle,
   colorDark,
   colorLight,
   active,
   onToggleTag,
 }) {
+  
   return (
     <StyledTag
       $active={active}
       $colorDark={colorDark}
       $colorLight={colorLight}
       onClick={() => {
-        onToggleTag(collectionTitle);
+        onToggleTag(collectionId);
       }}
     >
       <p>{collectionTitle}</p>

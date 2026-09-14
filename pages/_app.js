@@ -12,6 +12,12 @@ export default function App({ Component, pageProps }) {
     error,
   } = useSWR("/api/flashcards", fetcher);
 
+  const {
+    data: collections,
+    isLoading: collectionsIsLoading,
+    error: collectionsFetchError,
+  } = useSWR("/api/collections", fetcher);
+  
   return (
     <>
       <GlobalStyle />
@@ -23,6 +29,9 @@ export default function App({ Component, pageProps }) {
           flashcards={flashcards}
           isLoading={isLoading}
           error={error}
+          collections={collections}
+          collectionsIsLoading={collectionsIsLoading}
+          collectionsFetchError={collectionsFetchError}
         />
       </SWRConfig>
     </>

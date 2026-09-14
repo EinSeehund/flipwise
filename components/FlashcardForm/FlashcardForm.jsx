@@ -1,14 +1,25 @@
 import { useState } from "react";
 import styled from "styled-components";
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 
 export default function FlashcardForm({
   isEditing,
   flashcardObject,
   onToggleEdit,
+  collections,
+  collectionsIsLoading,
+  collectionsFetchError,
 }) {
   const { mutate } = useSWRConfig();
   const [error, setError] = useState(null);
+
+  if (collectionsIsLoading) {
+    return <p>Loading collections...</p>;
+  }
+
+  if (collectionsFetchError) {
+    return <p>Error: {collectionsFetchError.message}</p>;
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -16,6 +27,7 @@ export default function FlashcardForm({
 
     const formData = new FormData(event.target);
     const formObject = Object.fromEntries(formData.entries());
+
     let response;
 
     try {
@@ -37,6 +49,11 @@ export default function FlashcardForm({
         });
       }
 
+      if (!response.ok) {
+        const responseBody = await response.json();
+        throw new Error(responseBody.error || "Unable to save flashcard");
+      }
+
       if (response.ok) {
         mutate("/api/flashcards");
         if (isEditing) onToggleEdit();
@@ -48,7 +65,7 @@ export default function FlashcardForm({
   }
 
   return (
-    <StyledForm onSubmit={handleSubmit}>
+    <StyledForm onSubmit={handleSubmit} $isEditing={isEditing}>
       <h2>{isEditing ? "Edit flashcard" : "Create a new flashcard"}</h2>
       <StyledLabel htmlFor="question">Question</StyledLabel>
       <StyledTextarea
@@ -68,20 +85,17 @@ export default function FlashcardForm({
       ></StyledTextarea>
       <StyledLabel htmlFor="collection">Collection</StyledLabel>
       <StyledSelect
-        name="collection"
+        name="collection_id"
         id="collection"
-        defaultValue={isEditing ? flashcardObject.collection : ""}
+        defaultValue={isEditing ? flashcardObject.collection_id : ""}
         required
       >
         <option value="">-- Please select an option --</option>
-        <option value="Art">Art</option>
-        <option value="Biology">Biology</option>
-        <option value="Chemistry">Chemistry</option>
-        <option value="Geography">Geography</option>
-        <option value="Math">Math</option>
-        <option value="Music">Music</option>
-        <option value="Physics">Physics</option>
-        <option value="Technology">Technology</option>
+        {collections.map((collection) => (
+          <option value={collection._id} key={collection._id}>
+            {collection.collectionTitle}
+          </option>
+        ))}
       </StyledSelect>
       {error && <StyledError role="alert">Error: {error}</StyledError>}
       <StyledSubmitButton>{isEditing ? "Update" : "Create"}</StyledSubmitButton>
@@ -100,7 +114,9 @@ const StyledForm = styled.form`
   align-items: center;
   width: 90vw;
   max-width: 400px;
-  margin-bottom: 32px;
+  padding-bottom: 32px;
+  margin-bottom: ${({ $isEditing }) => !$isEditing && "32px"};
+  border-bottom: ${({ $isEditing }) => !$isEditing && "1px dotted gray"};
 `;
 const StyledTextarea = styled.textarea`
   width: 80%;
