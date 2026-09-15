@@ -49,6 +49,7 @@ export default function CollectionFilter({
 
 const CollectionContainer = styled.section`
   width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
