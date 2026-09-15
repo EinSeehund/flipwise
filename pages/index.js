@@ -16,6 +16,7 @@ export default function HomePage({
   const [showToast, setShowToast] = useState(false);
   const [showCollectionModal, setShowCollectionModal] = useState(false);
   const [filterById, setFilterById] = useState("");
+  const [editingCollection, setEditingCollection] = useState(null);
 
   function toggleToast(toastVisible) {
     setShowToast(toastVisible);
@@ -23,6 +24,29 @@ export default function HomePage({
 
   function toggleCollectionModal() {
     setShowCollectionModal(!showCollectionModal);
+  }
+
+  function openNewCollection() {
+    setEditingCollection(null);
+    setShowCollectionModal(true);
+  }
+
+  function openEditCollection() {
+    const selectedCollection = collections.find(
+      (collection) => collection._id === filterById
+    );
+
+    if (!selectedCollection) {
+      return;
+    }
+
+    setEditingCollection(selectedCollection);
+    setShowCollectionModal(true);
+  }
+
+  function closeCollectionModal() {
+    setEditingCollection(null);
+    setShowCollectionModal(false);
   }
 
   function handleFilter(collectionId) {
@@ -33,7 +57,11 @@ export default function HomePage({
     <main>
       {showToast && <ToastMessage text="Flashcard successfully deleted!" />}
       {showCollectionModal && (
-        <CollectionModal onClose={toggleCollectionModal} handleFilter={handleFilter} />
+        <CollectionModal
+          onClose={closeCollectionModal}
+          handleFilter={handleFilter}
+          editingCollection={editingCollection}
+        />
       )}
       <FlashcardForm
         isEditing={false}
@@ -48,6 +76,8 @@ export default function HomePage({
         filterById={filterById}
         onFilter={handleFilter}
         onToggleModal={toggleCollectionModal}
+        onNewCollection={openNewCollection}
+        onEditCollection={openEditCollection}
       />
       <FlashcardList
         flashcards={

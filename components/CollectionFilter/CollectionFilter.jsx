@@ -6,7 +6,9 @@ export default function CollectionFilter({
   collectionsFetchError,
   onFilter,
   onToggleModal,
-  filterById
+  onNewCollection,
+  onEditCollection,
+  filterById,
 }) {
   if (collectionsIsLoading) {
     return <p>Loading...</p>;
@@ -23,7 +25,11 @@ export default function CollectionFilter({
   return (
     <CollectionContainer>
       <label htmlFor="filterSelect">Filter Flashcards</label>
-      <StyledSelect value={filterById} id="filterSelect" onChange={handleChange}>
+      <StyledSelect
+        value={filterById}
+        id="filterSelect"
+        onChange={handleChange}
+      >
         <option value={""}>Show all collections</option>
         {collections.map((collection) => (
           <option key={collection._id} value={collection._id}>
@@ -32,7 +38,10 @@ export default function CollectionFilter({
         ))}
       </StyledSelect>
       <ButtonContainer>
-        <StyledButton onClick={onToggleModal}>New Collection</StyledButton>
+        <StyledButton onClick={onNewCollection}>New Collection</StyledButton>
+        <StyledButton onClick={onEditCollection} disabled={filterById === ""}>
+          Edit
+        </StyledButton>
       </ButtonContainer>
     </CollectionContainer>
   );
@@ -40,6 +49,7 @@ export default function CollectionFilter({
 
 const CollectionContainer = styled.section`
   width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,5 +87,8 @@ const StyledButton = styled.button`
   border: none;
   &:hover {
     cursor: pointer;
+  }
+  &:disabled {
+    opacity: 0.5;
   }
 `;

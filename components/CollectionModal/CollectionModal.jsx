@@ -3,11 +3,21 @@ import { useSWRConfig } from "swr";
 import styled from "styled-components";
 import { lighten, darken } from "polished";
 
-export default function CollectionModal({ onClose, handleFilter }) {
+export default function CollectionModal({
+  onClose,
+  handleFilter,
+  editingCollection,
+}) {
   const { mutate } = useSWRConfig();
-  const [titleInput, setTitleInput] = useState("");
-  const [colorDarkInput, setColorDarkInput] = useState("#000000");
-  const [colorLightInput, setColorLightInput] = useState("#3e3e3e");
+  const [titleInput, setTitleInput] = useState(
+    editingCollection ? editingCollection.collectionTitle : ""
+  );
+  const [colorDarkInput, setColorDarkInput] = useState(
+    editingCollection ? editingCollection.colorDark : "#000000"
+  );
+  const [colorLightInput, setColorLightInput] = useState(
+    editingCollection ? editingCollection.colorLight : "#3e3e3e"
+  );
   const [error, setError] = useState(null);
 
   async function handleSubmit(event) {
@@ -22,29 +32,53 @@ export default function CollectionModal({ onClose, handleFilter }) {
 
     let response;
 
-    try {
-      response = await fetch("/api/collections", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(collectionObject),
-      });
+    if (!editingCollection) {
+      try {
+        response = await fetch("/api/collections", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(collectionObject),
+        });
 
-      if (!response.ok) {
-        const responseBody = await response.json();
-        throw new Error(responseBody.error || "Unable to save flashcard");
-      }
+        if (!response.ok) {
+          const responseBody = await response.json();
+          throw new Error(responseBody.error || "Unable to save flashcard");
+        }
 
-      if (response.ok) {
-        const responseBody = await response.json();
-        const newCollectionId = responseBody.collection._id;
-        mutate("/api/collections");
-        handleFilter(newCollectionId);
-        onClose();
+        if (response.ok) {
+          const responseBody = await response.json();
+          const newCollectionId = responseBody.collection._id;
+          mutate("/api/collections");
+          handleFilter(newCollectionId);
+          onClose();
+        }
+      } catch (error) {
+        setError(error.message);
       }
-    } catch (error) {
-      setError(error.message);
+    } else {
+      try {
+        response = await fetch(`/api/collections/${editingCollection._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(collectionObject),
+        });
+
+        if (!response.ok) {
+          const responseBody = await response.json();
+          throw new Error(responseBody.error || "Unable to save flashcard");
+        }
+
+        if (response.ok) {
+          mutate("/api/collections");
+          onClose();
+        }
+      } catch (error) {
+        setError(error.message);
+      }
     }
   }
 
@@ -86,7 +120,7 @@ export default function CollectionModal({ onClose, handleFilter }) {
         </ColorContainer>
         <div>
           <AddButton disabled={titleInput === ""} type="submit">
-            Add
+            {editingCollection ? "Update" : "Add"}
           </AddButton>
           <CancelButton onClick={onClose} type="button">
             Cancel
