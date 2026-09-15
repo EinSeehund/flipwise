@@ -5,9 +5,9 @@ export default function CollectionFilter({
   collectionsIsLoading,
   collectionsFetchError,
   onFilter,
-  onToggleModal,
   onNewCollection,
   onEditCollection,
+  onDeleteCollection,
   filterById,
 }) {
   if (collectionsIsLoading) {
@@ -39,9 +39,17 @@ export default function CollectionFilter({
       </StyledSelect>
       <ButtonContainer>
         <StyledButton onClick={onNewCollection}>New Collection</StyledButton>
-        <StyledButton onClick={onEditCollection} disabled={filterById === ""}>
-          Edit
-        </StyledButton>
+        <div>
+          <StyledButton onClick={onEditCollection} disabled={filterById === ""}>
+            Edit
+          </StyledButton>
+          <StyledButton
+            onClick={onDeleteCollection}
+            disabled={filterById === ""}
+          >
+            Delete
+          </StyledButton>
+        </div>
       </ButtonContainer>
     </CollectionContainer>
   );
@@ -53,7 +61,9 @@ const CollectionContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 16px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px dotted gray;
 
   > label {
     margin-bottom: 4px;

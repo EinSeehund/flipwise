@@ -71,7 +71,7 @@ export default function Flashcard({
             ✎
           </StyledEditButton>
         )}
-        {!quizModeActive && (
+        {!editActive && !quizModeActive && (
           <StyledDeleteButton
             aria-label="Delete flashcard"
             onClick={onToggleDeleteConfirmation}
