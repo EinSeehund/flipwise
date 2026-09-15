@@ -6,6 +6,7 @@ export default function FlashcardForm({
   isEditing,
   flashcardObject,
   onToggleEdit,
+  onToggleForm,
   collections,
   collectionsIsLoading,
   collectionsFetchError,
@@ -99,11 +100,11 @@ export default function FlashcardForm({
       </StyledSelect>
       {error && <StyledError role="alert">Error: {error}</StyledError>}
       <StyledSubmitButton>{isEditing ? "Update" : "Create"}</StyledSubmitButton>
-      {isEditing && (
-        <StyledCancelButton type="button" onClick={onToggleEdit}>
+      
+        <StyledCancelButton type="button" onClick={isEditing ? onToggleEdit : onToggleForm}>
           Cancel
         </StyledCancelButton>
-      )}
+      
     </StyledForm>
   );
 }

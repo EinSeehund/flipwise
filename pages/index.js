@@ -1,9 +1,11 @@
+import CollectionDeleteModal from "@/components/CollectionDeleteModal/CollectionDeleteModal";
 import CollectionFilter from "@/components/CollectionFilter/CollectionFilter";
 import CollectionModal from "@/components/CollectionModal/CollectionModal";
 import FlashcardForm from "@/components/FlashcardForm/FlashcardForm";
 import FlashcardList from "@/components/FlashcardList/FlashcardList";
 import ToastMessage from "@/components/ToastMessage/ToastMessage";
 import { useState } from "react";
+import styled from "styled-components";
 
 export default function HomePage({
   flashcards,
@@ -13,17 +15,20 @@ export default function HomePage({
   collectionsIsLoading,
   collectionsFetchError,
 }) {
+  const [showNewCardForm, setShowNewCardForm] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [showCollectionModal, setShowCollectionModal] = useState(false);
+  const [showCollectionDeleteModal, setShowCollectionDeleteModal] =
+    useState(false);
   const [filterById, setFilterById] = useState("");
   const [editingCollection, setEditingCollection] = useState(null);
 
-  function toggleToast(toastVisible) {
-    setShowToast(toastVisible);
+  function toggleNewCardForm() {
+    setShowNewCardForm(!showNewCardForm);
   }
 
-  function toggleCollectionModal() {
-    setShowCollectionModal(!showCollectionModal);
+  function toggleToast(toastVisible) {
+    setShowToast(toastVisible);
   }
 
   function openNewCollection() {
@@ -49,6 +54,10 @@ export default function HomePage({
     setShowCollectionModal(false);
   }
 
+  function toggleCollectionDeleteModal() {
+    setShowCollectionDeleteModal(!showCollectionDeleteModal);
+  }
+
   function handleFilter(collectionId) {
     setFilterById(collectionId);
   }
@@ -63,22 +72,37 @@ export default function HomePage({
           editingCollection={editingCollection}
         />
       )}
-      <FlashcardForm
-        isEditing={false}
-        collections={collections}
-        collectionsIsLoading={collectionsIsLoading}
-        collectionsFetchError={collectionsFetchError}
-      />
+      {showCollectionDeleteModal && (
+        <CollectionDeleteModal
+          onClose={toggleCollectionDeleteModal}
+          collectionId={filterById}
+          handleFilter={handleFilter}
+        />
+      )}
       <CollectionFilter
         collections={collections}
         collectionsIsLoading={collectionsIsLoading}
         collectionsFetchError={collectionsFetchError}
         filterById={filterById}
         onFilter={handleFilter}
-        onToggleModal={toggleCollectionModal}
         onNewCollection={openNewCollection}
         onEditCollection={openEditCollection}
+        onDeleteCollection={toggleCollectionDeleteModal}
       />
+      {showNewCardForm && (
+        <FlashcardForm
+          isEditing={false}
+          collections={collections}
+          collectionsIsLoading={collectionsIsLoading}
+          collectionsFetchError={collectionsFetchError}
+          onToggleForm={toggleNewCardForm}
+        />
+      )}
+      {!showNewCardForm && (
+        <StyledButton onClick={toggleNewCardForm}>
+          Add New Flashcard
+        </StyledButton>
+      )}
       <FlashcardList
         flashcards={
           filterById
@@ -95,3 +119,19 @@ export default function HomePage({
     </main>
   );
 }
+
+const StyledButton = styled.button`
+  width: 100%;
+  max-width: 400px;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 16px 32px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background-color: #5f5fd2;
+  color: white;
+  border: none;
+  &:hover {
+    cursor: pointer;
+  }
+`;
