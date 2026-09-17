@@ -4,8 +4,7 @@ import { calculateNextReview } from "@/lib/sm2";
 
 export default async function handler(request, response) {
   const { id } = request.query;
-  // todaysDate is only passed for testing purposes and will be removed before merging into main
-  const { evaluation, todaysDate } = request.body;
+  const { evaluation } = request.body;
 
   try {
     await dbConnect();
@@ -19,9 +18,8 @@ export default async function handler(request, response) {
       if (!flashcard) {
         return response.status(404).json({ error: "Flashcard not found" });
       }
-      
-      // todaysDate is only passed for testing purposes and will be removed before merging into main
-      const updated = calculateNextReview(flashcard, evaluation, todaysDate);
+
+      const updated = calculateNextReview(flashcard, evaluation);
 
       flashcard.interval = updated.interval;
       flashcard.repetitions = updated.repetitions;

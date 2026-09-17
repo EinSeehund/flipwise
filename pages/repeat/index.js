@@ -5,7 +5,11 @@ import styled from "styled-components";
 import useSWR from "swr";
 import useLocalStorageState from "use-local-storage-state";
 
-export default function RepeatPage({ collections, collectionsIsLoading, collectionsFetchError }) {
+export default function RepeatPage({
+  collections,
+  collectionsIsLoading,
+  collectionsFetchError,
+}) {
   const [dayStats, setDayStats] = useLocalStorageState("dayStats", {
     defaultValue: {
       dateOfLastRepeat: "",
@@ -24,35 +28,42 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
     easyCards: 0,
     cardFlipped: false,
   });
+  const [updateError, setUpdateError] = useState(null);
 
-  // Only for testing, will not be merged into main
-  const [todaysDate, setTodaysDate] = useState("2026-09-17T23:59");
-
-  // The query parameter "todaysdate" is only passed for testing and will be removed before merging into main
-  const { data, isLoading, error } = useSWR(
-    `/api/flashcards?due=true&todaysdate=${todaysDate}`
-  );
+  const {
+    isLoading,
+    error,
+    mutate: refreshDueCards,
+  } = useSWR("/api/flashcards?due=true");
 
   useEffect(() => {
-    if (dayStats.dateOfLastRepeat === new Date().toLocaleDateString()) {
-      setCurrentScreen("result");
+    async function loadDueCards() {
+      const freshData = await refreshDueCards();
+
+      if (!freshData) {
+        return;
+      }
+
+      setDueCards(freshData);
+
+      if (
+        freshData.length === 0 &&
+        dayStats.dateOfLastRepeat === new Date().toLocaleDateString()
+      ) {
+        setCurrentScreen("result");
+      } else {
+        setCurrentScreen("setup");
+      }
     }
-  }, [dayStats.dateOfLastRepeat]);
 
-  useEffect(() => {
-    setDueCards(data);
-  }, [data]);
+    loadDueCards();
+  }, [refreshDueCards, dayStats.dateOfLastRepeat]);
 
   if (isLoading || collectionsIsLoading) {
     return <p>Loading...</p>;
   }
   if (error || collectionsFetchError) {
     return <p>Failed to fetch cards</p>;
-  }
-
-  // This handler is for testing only and will be removed before merging into main
-  function handleDateChange(event) {
-    setTodaysDate(event.target.value);
   }
 
   function startRepeating() {
@@ -78,40 +89,47 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
   }
 
   async function handleNextCard(evaluation) {
-    const response = await fetch(
-      `/api/flashcards/${dueCards[repeatState.currentCardIndex]._id}/review`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // todaysDate is only passed for testing purposes and will be removed before merging into main
-        body: JSON.stringify({ evaluation, todaysDate }),
+    setUpdateError(null);
+    let response;
+
+    try {
+      response = await fetch(
+        `/api/flashcards/${dueCards[repeatState.currentCardIndex]._id}/review`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ evaluation }),
+        }
+      );
+    } catch (error) {
+      setUpdateError("Network error...");
+      return;
+    }
+
+    if (response.ok) {
+      if (repeatState.currentCardIndex < dueCards.length - 1) {
+        setRepeatState((prev) => ({
+          currentCardIndex: prev.currentCardIndex + 1,
+          wrongCards: evaluation === 1 ? prev.wrongCards + 1 : prev.wrongCards,
+          correctCards:
+            evaluation === 3 ? prev.correctCards + 1 : prev.correctCards,
+          easyCards: evaluation === 5 ? prev.easyCards + 1 : prev.easyCards,
+          cardFlipped: false,
+        }));
+      } else {
+        setRepeatState((prev) => ({
+          ...prev,
+          wrongCards: evaluation === 1 ? prev.wrongCards + 1 : prev.wrongCards,
+          correctCards:
+            evaluation === 3 ? prev.correctCards + 1 : prev.correctCards,
+          easyCards: evaluation === 5 ? prev.easyCards + 1 : prev.easyCards,
+          cardFlipped: false,
+        }));
+        updateDayStats(evaluation);
+        setCurrentScreen("result");
       }
-    );
-
-    // Keeping this console.log for testing purposes, will not be merged into main
-    const updatedFlashcard = await response.json();
-    console.log("New due date of this card is ", updatedFlashcard.dueDate);
-
-    if (repeatState.currentCardIndex < dueCards.length - 1) {
-      setRepeatState((prev) => ({
-        currentCardIndex: prev.currentCardIndex + 1,
-        wrongCards: evaluation === 1 ? prev.wrongCards + 1 : prev.wrongCards,
-        correctCards:
-          evaluation === 3 ? prev.correctCards + 1 : prev.correctCards,
-        easyCards: evaluation === 5 ? prev.easyCards + 1 : prev.easyCards,
-        cardFlipped: false,
-      }));
     } else {
-      setRepeatState((prev) => ({
-        ...prev,
-        wrongCards: evaluation === 1 ? prev.wrongCards + 1 : prev.wrongCards,
-        correctCards:
-          evaluation === 3 ? prev.correctCards + 1 : prev.correctCards,
-        easyCards: evaluation === 5 ? prev.easyCards + 1 : prev.easyCards,
-        cardFlipped: false,
-      }));
-      updateDayStats(evaluation);
-      setCurrentScreen("result");
+      setUpdateError("Could not update card in database...");
     }
   }
 
@@ -139,19 +157,6 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
           {dueCards?.length !== 0 && (
             <StartButton onClick={startRepeating}>Repeat now!</StartButton>
           )}
-
-          {/* The date input is for testing only, will not be merged into main */}
-          <DateSimulator>
-            <p>
-              Simulate a different date. Only for testing purposes, will not be
-              merged into main:
-            </p>
-            <input
-              type="datetime-local"
-              value={todaysDate}
-              onChange={handleDateChange}
-            />
-          </DateSimulator>
         </ContentWrapper>
       )}
       {currentScreen === "repeating" && (
@@ -164,19 +169,29 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
             onFlip={handleFlip}
           />
           <EvaluationButtonContainer $visible={repeatState.cardFlipped}>
-            <EvaluationButton onClick={() => handleNextCard(1)}>
+            <EvaluationButton
+              disabled={!repeatState.cardFlipped}
+              onClick={() => handleNextCard(1)}
+            >
               <EvaluationButtonEmoji>❌</EvaluationButtonEmoji>
               <EvaluationButtonText>Wrong</EvaluationButtonText>
             </EvaluationButton>
-            <EvaluationButton onClick={() => handleNextCard(3)}>
+            <EvaluationButton
+              disabled={!repeatState.cardFlipped}
+              onClick={() => handleNextCard(3)}
+            >
               <EvaluationButtonEmoji>👍</EvaluationButtonEmoji>
               <EvaluationButtonText>Correct</EvaluationButtonText>
             </EvaluationButton>
-            <EvaluationButton onClick={() => handleNextCard(5)}>
+            <EvaluationButton
+              disabled={!repeatState.cardFlipped}
+              onClick={() => handleNextCard(5)}
+            >
               <EvaluationButtonEmoji>💪</EvaluationButtonEmoji>
               <EvaluationButtonText>Easy</EvaluationButtonText>
             </EvaluationButton>
           </EvaluationButtonContainer>
+          {updateError && <p>{updateError}</p>}
         </ContentWrapper>
       )}
       {currentScreen === "result" && (
@@ -219,16 +234,6 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
     </main>
   );
 }
-
-// Only for testing, will be removed
-const DateSimulator = styled.div`
-  position: fixed;
-  max-width: 300px;
-  bottom: 80px;
-  > p {
-    font-size: small;
-  }
-`;
 
 const ContentWrapper = styled.div`
   position: fixed;

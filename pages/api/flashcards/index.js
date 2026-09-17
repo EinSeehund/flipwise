@@ -2,8 +2,7 @@ import dbConnect from "@/db/connect";
 import Flashcard from "@/db/models/Flashcard";
 
 export default async function handler(request, response) {
-  // The query parameter "todaysdate" is only passed for testing and will be removed before merging into main
-  const { due, todaysdate } = request.query;
+  const { due } = request.query;
 
   try {
     await dbConnect();
@@ -14,8 +13,7 @@ export default async function handler(request, response) {
   if (request.method === "GET") {
     if (due === "true") {
       const dueFlashcards = await Flashcard.find({
-        // The variable todaysdate is used for testing and will be replaced with "new Date()" before merging into main
-        dueDate: { $lte: todaysdate },
+        dueDate: { $lte: new Date() },
       });
       return response.status(200).json(dueFlashcards);
     }
