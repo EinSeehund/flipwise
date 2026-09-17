@@ -46,7 +46,7 @@ export default function RepeatPage({ collections }) {
   if (isLoading || collectionsIsLoading) {
     return <p>Loading...</p>;
   }
-  if (error) {
+  if (error || collectionsFetchError) {
     return <p>Failed to fetch cards</p>;
   }
 
