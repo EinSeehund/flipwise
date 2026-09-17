@@ -43,7 +43,7 @@ export default function RepeatPage({ collections }) {
     setDueCards(data);
   }, [data]);
 
-  if (isLoading) {
+  if (isLoading || collectionsIsLoading) {
     return <p>Loading...</p>;
   }
   if (error) {
