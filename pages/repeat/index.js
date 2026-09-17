@@ -5,7 +5,7 @@ import styled from "styled-components";
 import useSWR from "swr";
 import useLocalStorageState from "use-local-storage-state";
 
-export default function RepeatPage({ collections }) {
+export default function RepeatPage({ collections, collectionsIsLoading, collectionsFetchError }) {
   const [dayStats, setDayStats] = useLocalStorageState("dayStats", {
     defaultValue: {
       dateOfLastRepeat: "",
