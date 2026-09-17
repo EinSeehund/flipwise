@@ -56,7 +56,7 @@ export default function RepeatPage({ collections, collectionsIsLoading, collecti
   }
 
   function startRepeating() {
-    setDueCards((prev) => fisherYatesShuffle(prev));
+    setDueCards((prev) => fisherYatesShuffle([...prev]));
     setCurrentScreen("repeating");
   }
 
