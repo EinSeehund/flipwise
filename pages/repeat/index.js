@@ -184,9 +184,9 @@ export default function RepeatPage({ collections }) {
           <TextLarge>Finished!!!</TextLarge>
           <EmojiWrapper>🏁</EmojiWrapper>
           <TextMedium>
-            You've repeated all due flashcards for today!
+            You&apos;ve repeated all due flashcards for today!
             <br />
-            <br /> Here's how you did:
+            <br /> Here&apos;s how you did:
           </TextMedium>
           <ResultContainer>
             <ResultWrapper>
