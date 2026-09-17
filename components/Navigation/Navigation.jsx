@@ -10,6 +10,15 @@ export default function Navigation() {
       <StyledList>
         <li>
           <StyledLink
+            href="/repeat"
+            $active={router.pathname === "/repeat"}
+            aria-current={router.pathname === "/repeat" ? "page" : undefined}
+          >
+            Repeat
+          </StyledLink>
+        </li>
+        <li>
+          <StyledLink
             href="/quiz"
             $active={router.pathname === "/quiz"}
             aria-current={router.pathname === "/quiz" ? "page" : undefined}

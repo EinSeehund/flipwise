@@ -2,6 +2,8 @@ import dbConnect from "@/db/connect";
 import Flashcard from "@/db/models/Flashcard";
 
 export default async function handler(request, response) {
+  const { due } = request.query;
+
   try {
     await dbConnect();
   } catch (error) {
@@ -9,6 +11,13 @@ export default async function handler(request, response) {
   }
 
   if (request.method === "GET") {
+    if (due === "true") {
+      const dueFlashcards = await Flashcard.find({
+        dueDate: { $lte: new Date() },
+      });
+      return response.status(200).json(dueFlashcards);
+    }
+
     try {
       const flashcards = await Flashcard.find().sort({ _id: -1 });
       return response.status(200).json(flashcards);

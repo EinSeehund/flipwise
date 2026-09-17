@@ -56,7 +56,8 @@ export default function FlashcardForm({
       }
 
       if (response.ok) {
-        mutate("/api/flashcards");
+        await mutate("/api/flashcards");
+        await mutate("/api/flashcards?due=true");
         if (isEditing) onToggleEdit();
         else event.target.reset();
       }
@@ -100,11 +101,13 @@ export default function FlashcardForm({
       </StyledSelect>
       {error && <StyledError role="alert">Error: {error}</StyledError>}
       <StyledSubmitButton>{isEditing ? "Update" : "Create"}</StyledSubmitButton>
-      
-        <StyledCancelButton type="button" onClick={isEditing ? onToggleEdit : onToggleForm}>
-          Cancel
-        </StyledCancelButton>
-      
+
+      <StyledCancelButton
+        type="button"
+        onClick={isEditing ? onToggleEdit : onToggleForm}
+      >
+        Cancel
+      </StyledCancelButton>
     </StyledForm>
   );
 }
