@@ -85,8 +85,6 @@ export default function CsvImport({ collections }) {
       answer: document.answer,
     }));
 
-    console.log(documents);
-
     try {
       const response = await fetch("/api/flashcards/import", {
         method: "POST",
