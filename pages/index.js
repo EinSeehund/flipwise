@@ -1,6 +1,7 @@
 import CollectionDeleteModal from "@/components/CollectionDeleteModal/CollectionDeleteModal";
 import CollectionFilter from "@/components/CollectionFilter/CollectionFilter";
 import CollectionModal from "@/components/CollectionModal/CollectionModal";
+import CsvImport from "@/components/CsvImport/CsvImport";
 import FlashcardForm from "@/components/FlashcardForm/FlashcardForm";
 import FlashcardList from "@/components/FlashcardList/FlashcardList";
 import ToastMessage from "@/components/ToastMessage/ToastMessage";
@@ -103,6 +104,7 @@ export default function HomePage({
           Add New Flashcard
         </StyledButton>
       )}
+      <CsvImport collections={collections} />
       <FlashcardList
         flashcards={
           filterById
