@@ -27,12 +27,6 @@ export default function CsvImport({ collections }) {
       header: true,
       skipEmptyLines: true,
       complete: function (results) {
-        if (results.errors.length > 0) {
-          setCsvError("Unable to parse CSV file.");
-          setParsedData([]);
-          return;
-        }
-
         if (results.data.length === 0) {
           setCsvError("No data found in this file.");
           setParsedData([]);
@@ -65,6 +59,11 @@ export default function CsvImport({ collections }) {
           setCsvError(
             `${invalid.length} rows are empty, please check csv file`
           );
+          setParsedData([]);
+          return;
+        }
+        if (results.errors.length > 0) {
+          setCsvError("Unable to parse CSV file.");
           setParsedData([]);
           return;
         }
