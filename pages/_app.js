@@ -1,7 +1,6 @@
 import Header from "@/components/Header/Header";
 import GlobalStyle from "../styles";
 import useSWR, { SWRConfig } from "swr";
-import Navigation from "@/components/Navigation/Navigation";
 
 const fetcher = (...args) => fetch(...args).then((response) => response.json());
 
@@ -22,7 +21,6 @@ export default function App({ Component, pageProps }) {
     <>
       <GlobalStyle />
       <Header />
-      <Navigation />
       <SWRConfig value={{ fetcher }}>
         <Component
           {...pageProps}

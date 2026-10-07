@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
+import getCardColors from "@/utils/getCardColors";
 import FlashcardForm from "../FlashcardForm/FlashcardForm";
 import DeleteConfirmationDialog from "../DeleteConfirmationDialog/DeleteConfirmationDialog";
 
@@ -17,6 +18,9 @@ export default function Flashcard({
   const currentCollection = collections.find(
     (collection) => collection._id === flashcardObject.collection_id
   );
+
+  const frontColors = getCardColors(currentCollection.colorDark);
+  const backColors = getCardColors(currentCollection.colorLight);
 
   function handleFlip() {
     if (quizModeActive) {
@@ -39,29 +43,24 @@ export default function Flashcard({
     <>
       <StyledFlashcardContainer onClick={handleFlip}>
         <StyledFlashcard $isFlipped={isFlipped}>
-          <StyledFlashcardFront
-            $flashcardObject={flashcardObject}
-            $backgroundColor={currentCollection.colorDark}
-          >
-            <StyledCollectionTag>
-              {currentCollection.collectionTitle}
-            </StyledCollectionTag>
-            <StyledFlashcardText>
-              <StyledQATag>❓</StyledQATag>
-              <p>{flashcardObject.question}</p>
-            </StyledFlashcardText>
+          <StyledFlashcardFront $colors={frontColors}>
+            <StyledCardHeader>
+              <StyledCollectionTag>
+                {currentCollection.collectionTitle}
+              </StyledCollectionTag>
+              <StyledSideLabel>Question</StyledSideLabel>
+            </StyledCardHeader>
+            <StyledCardText>{flashcardObject.question}</StyledCardText>
+            <StyledFlipHint>Tap to reveal answer</StyledFlipHint>
           </StyledFlashcardFront>
-          <StyledFlashcardBack
-            $flashcardObject={flashcardObject}
-            $backgroundColor={currentCollection.colorLight}
-          >
-            <StyledCollectionTag>
-              {currentCollection.collectionTitle}
-            </StyledCollectionTag>
-            <StyledFlashcardText>
-              <StyledQATag>✔️</StyledQATag>
-              <p>{flashcardObject.answer}</p>
-            </StyledFlashcardText>
+          <StyledFlashcardBack $colors={backColors}>
+            <StyledCardHeader>
+              <StyledCollectionTag>
+                {currentCollection.collectionTitle}
+              </StyledCollectionTag>
+              <StyledSideLabel>Answer</StyledSideLabel>
+            </StyledCardHeader>
+            <StyledCardText>{flashcardObject.answer}</StyledCardText>
           </StyledFlashcardBack>
         </StyledFlashcard>
       </StyledFlashcardContainer>
@@ -99,110 +98,120 @@ export default function Flashcard({
   );
 }
 
-const StyledFlashcard = styled.div`
-  width: 100%;
-  position: relative;
-  display: grid;
-  border: 1px solid #e4e2e2;
-  padding: 4px;
-  border-radius: 10px;
-  box-shadow:
-    0 4px 8px 0 rgba(0, 0, 0, 0.2),
-    0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  transform: ${({ $isFlipped }) =>
-    $isFlipped ? "rotateY(180deg)" : "rotateY(0deg)"};
-`;
-const StyledCollectionTag = styled.p`
-  align-self: flex-start;
-  font-size: 1rem;
-  font-weight: 400;
-  margin: 0 0 10px 5px;
-  color: white;
-`;
-const StyledFlashcardText = styled.section`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  padding: 10px;
-  margin: 0;
-  background-color: white;
-  border-radius: 0 0 10px 10px;
-  font-family: "Times New Roman", Times, serif;
-`;
-const StyledQATag = styled.div`
-  font-size: 1.2rem;
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  top: 10px;
-  right: 12px;
-  background-color: white;
-`;
 const StyledFlashcardContainer = styled.article`
   width: 90vw;
   max-width: 400px;
   cursor: pointer;
-  perspective: 1000px;
-`;
-const FlashcardFace = styled.div`
-  backface-visibility: hidden;
-  grid-area: 1 / 1 / 2 / 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  padding: 10px;
-  border-radius: 10px;
-`;
-const StyledFlashcardFront = styled(FlashcardFace)`
-  font-size: 1.2rem;
-  font-weight: 600;
-  background-color: ${({ $backgroundColor }) => $backgroundColor};
-`;
-const StyledFlashcardBack = styled(FlashcardFace)`
-  transform: rotateY(180deg);
-  font-size: 1.2rem;
-  font-weight: 400;
-  background-color: ${({ $backgroundColor }) => $backgroundColor};
-`;
-const StyledButtonContainer = styled.div`
-  width: 97%;
-  display: flex;
-  justify-content: flex-end;
-`;
-const StyledEditButton = styled.button`
-  font-size: 1.2rem;
-  border: none;
-  background-color: #605b5b;
-  color: white;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  margin-top: 8px;
-  margin-right: 8px;
+  perspective: 1200px;
+  transition: transform 0.2s ease;
+
   &:hover {
-    cursor: pointer;
-    background-color: #7e7777;
+    transform: translateY(-3px);
   }
 `;
-const StyledDeleteButton = styled.button`
-  font-size: 1.2rem;
-  border: none;
-  background-color: #dc1a1a;
-  color: white;
+const StyledFlashcard = styled.div`
+  display: grid;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  transform: ${({ $isFlipped }) =>
+    $isFlipped ? "rotateY(180deg)" : "rotateY(0deg)"};
+`;
+const FlashcardFace = styled.div`
+  grid-area: 1 / 1;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 220px;
+  padding: 20px;
+  border-radius: 20px;
+  color: ${({ $colors }) => $colors.textColor};
+  background: ${({ $colors }) =>
+    `linear-gradient(135deg, ${$colors.background}, ${$colors.gradientEnd})`};
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.08),
+    0 12px 32px -8px rgba(0, 0, 0, 0.25);
+`;
+const StyledFlashcardFront = styled(FlashcardFace)``;
+const StyledFlashcardBack = styled(FlashcardFace)`
+  transform: rotateY(180deg);
+`;
+const StyledCardHeader = styled.header`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+`;
+const StyledCollectionTag = styled.span`
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+const StyledSideLabel = styled.span`
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+`;
+const StyledCardText = styled.p`
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+`;
+const StyledFlipHint = styled.span`
+  align-self: center;
+  font-size: 0.75rem;
+`;
+const StyledButtonContainer = styled.div`
+  width: 90vw;
+  max-width: 400px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+`;
+const StyledIconButton = styled.button`
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e5e5e5;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  margin-top: 8px;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+`;
+const StyledEditButton = styled(StyledIconButton)`
+  color: #4b4b4b;
+
   &:hover {
-    cursor: pointer;
-    background-color: #f34343;
+    background-color: #f2f2f2;
+  }
+`;
+const StyledDeleteButton = styled(StyledIconButton)`
+  color: #dc1a1a;
+
+  &:hover {
+    background-color: #dc1a1a;
+    border-color: #dc1a1a;
+    color: white;
   }
 `;
