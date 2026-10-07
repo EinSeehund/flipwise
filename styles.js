@@ -18,5 +18,10 @@ export default createGlobalStyle`
     flex-direction: column;
     align-items: center;
     padding-top: 75px;
+    padding-bottom: 80px;
+
+    @media (min-width: 768px) {
+      padding-bottom: 24px;
+    }
   }
 `;
